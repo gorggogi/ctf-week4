@@ -38,7 +38,8 @@ STAGES = {
         "description": "Process the full dataset using your understanding of the circuit.",
         "hint": "Write a script to perform the logical operations on all input rows.",
         "next_stage": None,  # Final stage
-        "full_data_path": "static/files/input.csv"
+        "full_data_path": "static/files/input.csv",
+        "flag": "HTB{4_G00d_Cm05_3x4mpl3}"  # Added the flag
     }
 }
 
@@ -151,7 +152,7 @@ def stage(stage_id):
                             session.modified = True
                         return jsonify({
                             'success': True,
-                            'message': "Correct! Your script produced the expected output. Congratulations! You've completed all stages!"
+                            'message': f"Correct! Your script produced the expected output. Congratulations! You've completed all stages! Here's your flag: {STAGES[3]['flag']}"
                         })
                     else:
                         return jsonify({
