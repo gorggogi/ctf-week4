@@ -44,7 +44,7 @@ def validate_stage2_answer(answer, sample_inputs):
 
 def validate_stage3_answer(answer, input_file):
     """
-    Stage 3 expects users to process the full input file
+    Stage 3 expects users to process the full input file and decode the flag
     """
     # Process the full input file
     expected_binary = process_full_input(input_file)

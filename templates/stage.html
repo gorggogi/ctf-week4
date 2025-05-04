@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stage {{ stage_id }} - Low Logic Challenge</title>
+    <title>Stage {{ stage_id }} - Hardware Reverse Engineering Challenge</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -87,13 +87,6 @@
                     <button type="submit" class="btn submit-btn">Submit Gates</button>
                 </form>
             </div>
-
-            <div id="stage1-flag-section" class="flag-reveal" style="display: none;">
-                <h2>Analysis Complete</h2>
-                <p>The circuit appears to be processing binary data in a specific pattern.</p>
-                <p>You've uncovered the first segment of the encoded message:</p>
-                <div class="revealed-flag">{{ stage.flag }}</div>
-            </div>
             {% endif %}
 
             {% if stage_id == 2 %}
@@ -107,13 +100,6 @@
                     </div>
                     <button type="submit" class="btn submit-btn">Submit Output</button>
                 </form>
-            </div>
-
-            <div id="stage2-flag-section" class="flag-reveal" style="display: none;">
-                <h2>Pattern Recognized</h2>
-                <p>The output pattern confirms our understanding of the circuit's behavior.</p>
-                <p>You've uncovered the second segment of the encoded message:</p>
-                <div class="revealed-flag">{{ stage.flag }}</div>
             </div>
             {% endif %}
             
@@ -143,24 +129,6 @@
                     </div>
                 </div>
             </div>
-
-            <div id="stage3-flag-section" class="flag-reveal" style="display: none;">
-                <h2>Full Circuit Analysis Complete</h2>
-                <p>The complete dataset reveals the final piece of the circuit's function.</p>
-                <p>You've uncovered the final segment of the encoded message:</p>
-                <div class="revealed-flag">{{ stage.flag }}</div>
-            </div>
-            {% endif %}
-            
-            {% if (stage_id == 1 and show_flag_input) or (stage_id == 2 and show_flag_input) or stage_id > 2 %}
-            <div class="flag-submission">
-                <h2>Submit Flag</h2>
-                <form method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
-                    <input type="hidden" name="form_type" value="flag">
-                    <input type="text" name="flag" placeholder="Enter flag...">
-                    <button type="submit" class="btn submit-btn">Submit</button>
-                </form>
-            </div>
             {% endif %}
             
             <div class="hint-section">
@@ -172,21 +140,87 @@
                 </details>
             </div>
         </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" data-progress="{{ (stage_id / 3) * 100 }}"></div>
+            </div>
+            <div class="progress-stages">
+                <span class="stage-dot {{ 'completed' if stage_id >= 1 else '' }}">1</span>
+                <span class="stage-dot {{ 'completed' if stage_id >= 2 else '' }}">2</span>
+                <span class="stage-dot {{ 'completed' if stage_id >= 3 else '' }}">3</span>
+            </div>
+        </div>
         
         <footer>
-            <p>Created for your CTF Website &copy; 2025</p>
+            <p>Secure Analysis Environment v1.0</p>
             <a href="{{ url_for('index') }}">Back to Challenge Overview</a>
         </footer>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
     <script>
+        // Set progress bar width
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            const progress = progressFill.getAttribute('data-progress');
+            progressFill.style.width = `${progress}%`;
+        }
+
         // Handle gate form submission
         const gateForm = document.getElementById('gate-form');
         if (gateForm) {
             gateForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                handleFormSubmission(this, 'stage1-flag-section');
+                const formData = new FormData(this);
+                
+                // Add transition class
+                document.querySelector('.container').classList.add('stage-transition');
+                
+                // Wait for animation to complete before submitting
+                setTimeout(() => {
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                            return;
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        if (!html) return;
+                        
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const message = doc.querySelector('.message');
+                        
+                        if (message) {
+                            // Update the message on the page
+                            const currentMessage = document.querySelector('.message');
+                            if (currentMessage) {
+                                currentMessage.textContent = message.textContent;
+                                currentMessage.className = message.className;
+                            } else {
+                                const messageDiv = document.createElement('div');
+                                messageDiv.className = message.className;
+                                messageDiv.textContent = message.textContent;
+                                document.querySelector('.challenge-content').insertBefore(messageDiv, this.parentElement);
+                            }
+                            
+                            message.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = 'An error occurred. Please try again.';
+                        document.querySelector('.challenge-content').insertBefore(messageDiv, this.parentElement);
+                    });
+                }, 500); // Match animation duration
             });
         }
 
@@ -195,71 +229,55 @@
         if (outputForm) {
             outputForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                handleFormSubmission(this, 'stage2-flag-section');
-            });
-        }
-
-        function handleFormSubmission(form, flagSectionId) {
-            const formData = new FormData(form);
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
-                return response.text();
-            })
-            .then(html => {
-                if (!html) return;
+                const formData = new FormData(this);
                 
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const message = doc.querySelector('.message');
+                // Add transition class
+                document.querySelector('.container').classList.add('stage-transition');
                 
-                if (message) {
-                    // Update the message on the page
-                    const currentMessage = document.querySelector('.message');
-                    if (currentMessage) {
-                        currentMessage.textContent = message.textContent;
-                        currentMessage.className = message.className;
-                    } else {
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = message.className;
-                        messageDiv.textContent = message.textContent;
-                        document.querySelector('.challenge-content').insertBefore(messageDiv, form.parentElement);
-                    }
-
-                    if (message.textContent.includes('Correct!')) {
-                        document.getElementById(flagSectionId).style.display = 'block';
-                        
-                        // Create and show the flag submission form if it doesn't exist
-                        if (!document.querySelector('.flag-submission')) {
-                            const flagForm = document.createElement('div');
-                            flagForm.className = 'flag-submission';
-                            flagForm.innerHTML = `
-                                <h2>Submit Flag</h2>
-                                <form method="POST" action="${form.action}">
-                                    <input type="hidden" name="form_type" value="flag">
-                                    <input type="text" name="flag" placeholder="Enter flag...">
-                                    <button type="submit" class="btn submit-btn">Submit</button>
-                                </form>
-                            `;
-                            document.querySelector('.challenge-content').appendChild(flagForm);
+                // Wait for animation to complete before submitting
+                setTimeout(() => {
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                            return;
                         }
+                        return response.text();
+                    })
+                    .then(html => {
+                        if (!html) return;
                         
-                        message.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message error';
-                messageDiv.textContent = 'An error occurred. Please try again.';
-                document.querySelector('.challenge-content').insertBefore(messageDiv, form.parentElement);
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const message = doc.querySelector('.message');
+                        
+                        if (message) {
+                            // Update the message on the page
+                            const currentMessage = document.querySelector('.message');
+                            if (currentMessage) {
+                                currentMessage.textContent = message.textContent;
+                                currentMessage.className = message.className;
+                            } else {
+                                const messageDiv = document.createElement('div');
+                                messageDiv.className = message.className;
+                                messageDiv.textContent = message.textContent;
+                                document.querySelector('.challenge-content').insertBefore(messageDiv, this.parentElement);
+                            }
+                            
+                            message.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = 'An error occurred. Please try again.';
+                        document.querySelector('.challenge-content').insertBefore(messageDiv, this.parentElement);
+                    });
+                }, 500); // Match animation duration
             });
         }
 
@@ -325,46 +343,38 @@ with open('input.csv', 'r') as f:
                 // Handle submit button click
                 document.getElementById('submit-script').addEventListener('click', function() {
                     const code = editor.getValue();
-                    fetch('/submit_script', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ code: code })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById('stage3-flag-section').style.display = 'block';
-                            if (!document.querySelector('.flag-submission')) {
-                                const flagForm = document.createElement('div');
-                                flagForm.className = 'flag-submission';
-                                flagForm.innerHTML = `
-                                    <h2>Submit Flag</h2>
-                                    <form method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
-                                        <input type="hidden" name="form_type" value="flag">
-                                        <input type="text" name="flag" placeholder="Enter flag...">
-                                        <button type="submit" class="btn submit-btn">Submit</button>
-                                    </form>
-                                `;
-                                document.querySelector('.challenge-content').appendChild(flagForm);
+                    
+                    // Add transition class
+                    document.querySelector('.container').classList.add('stage-transition');
+                    
+                    // Wait for animation to complete before submitting
+                    setTimeout(() => {
+                        fetch('/submit_script', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ code: code })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = '/completion';
+                            } else {
+                                const messageDiv = document.createElement('div');
+                                messageDiv.className = 'message error';
+                                messageDiv.textContent = data.message;
+                                document.querySelector('.challenge-content').insertBefore(messageDiv, document.querySelector('.code-editor-section'));
                             }
-                        }
-                        // Show message
-                        const currentMessage = document.querySelector('.message');
-                        if (currentMessage) {
-                            currentMessage.textContent = data.message;
-                            currentMessage.className = `message ${data.success ? 'success' : 'error'}`;
-                        } else {
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
                             const messageDiv = document.createElement('div');
-                            messageDiv.className = `message ${data.success ? 'success' : 'error'}`;
-                            messageDiv.textContent = data.message;
+                            messageDiv.className = 'message error';
+                            messageDiv.textContent = 'An error occurred. Please try again.';
                             document.querySelector('.challenge-content').insertBefore(messageDiv, document.querySelector('.code-editor-section'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
+                        });
+                    }, 500); // Match animation duration
                 });
             });
         }

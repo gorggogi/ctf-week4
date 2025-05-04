@@ -30,6 +30,7 @@ body {
     margin: 0 auto;
     padding: 2rem;
     flex: 1;
+    animation: fadeIn 0.5s ease-out forwards;
 }
 
 /* Header Styles */
@@ -501,4 +502,91 @@ footer a:hover {
     color: var(--text-color);
     font-size: 0.9rem;
     opacity: 0.8;
+}
+
+.progress-container {
+    margin: 2rem 0;
+    padding: 1rem;
+    background: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.progress-stages {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-stages::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+.stage-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.stage-dot.completed {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Stage Transition Animations */
+.stage-transition {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

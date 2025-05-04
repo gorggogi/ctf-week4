@@ -16,7 +16,6 @@ STAGES = {
         "name": "Circuit Identification",
         "description": "Analyze the provided circuit diagram and identify the logic gates used.",
         "hint": "Look at how the transistors are connected to identify standard logic gates.",
-        "flag": "HTB{",
         "next_stage": 2,
         "correct_gates": ["AND", "AND", "OR"]  # Two AND gates followed by one OR gate
     },
@@ -24,7 +23,6 @@ STAGES = {
         "name": "Logic Gate Implementation",
         "description": "Based on your identified gates, calculate the outputs for these sample inputs.",
         "hint": "Remember: first perform the two AND operations, then combine with OR.",
-        "flag": "4_G00d_Cm",
         "next_stage": 3,
         "sample_data": [
             [0, 1, 0, 0],
@@ -39,7 +37,6 @@ STAGES = {
         "name": "Circuit Automation",
         "description": "Process the full dataset using your understanding of the circuit.",
         "hint": "Write a script to perform the logical operations on all input rows.",
-        "flag": "05_3x4mpl3}",
         "next_stage": None,  # Final stage
         "full_data_path": "static/files/input.csv"
     }
@@ -52,10 +49,6 @@ def check_stage_access(requested_stage):
     if requested_stage == 1 or (requested_stage > 1 and requested_stage - 1 in user_progress):
         return True
     return False
-
-# Function to check if the flag is correct
-def validate_flag(stage, submitted_flag):
-    return submitted_flag.strip() == STAGES[stage]["flag"]
 
 # Sample input processing function (for reference or server-side validation)
 def process_sample_logic(inputs):
@@ -84,7 +77,6 @@ def stage(stage_id):
     
     stage_data = STAGES[stage_id]
     message = None
-    show_flag_input = session.get('gates_identified', False) if stage_id == 1 else session.get('output_calculated', False)
     
     if request.method == 'POST':
         form_type = request.form.get('form_type')
@@ -96,9 +88,13 @@ def stage(stage_id):
             gate3 = request.form.get('gate3', '').upper()
             
             if [gate1, gate2, gate3] == stage_data['correct_gates']:
-                session['gates_identified'] = True
-                show_flag_input = True
-                message = "Correct! The circuit consists of two AND gates followed by an OR gate. Now you can submit the flag."
+                if 'completed_stages' not in session:
+                    session['completed_stages'] = []
+                if stage_id not in session['completed_stages']:
+                    session['completed_stages'].append(stage_id)
+                    session.modified = True
+                message = "Correct! The circuit consists of two AND gates followed by an OR gate. Moving to stage 2..."
+                return redirect(url_for('stage', stage_id=2))
             else:
                 message = "Incorrect gate identification. Try again!"
         elif form_type == 'output' and stage_id == 2:
@@ -106,47 +102,80 @@ def stage(stage_id):
             submitted_output = request.form.get('output', '')
             
             if submitted_output == stage_data['correct_output']:
-                session['output_calculated'] = True
-                show_flag_input = True
-                message = "Correct! You've successfully calculated the outputs. Now you can submit the flag."
-            else:
-                message = "Incorrect output calculation. Try again!"
-        elif form_type == 'flag':
-            # Handle flag submission
-            submitted_flag = request.form.get('flag', '')
-            print(f"Submitted flag: {submitted_flag}")  # Debug print
-            print(f"Expected flag: {stage_data['flag']}")  # Debug print
-            
-            if validate_flag(stage_id, submitted_flag):
                 if 'completed_stages' not in session:
                     session['completed_stages'] = []
                 if stage_id not in session['completed_stages']:
                     session['completed_stages'].append(stage_id)
-                    session.modified = True  # Ensure session is saved
-                
-                print(f"Updated completed stages: {session['completed_stages']}")  # Debug print
-                
-                # Clear the gate/output identification for the next stage
-                if stage_id == 1:
-                    session.pop('gates_identified', None)
-                elif stage_id == 2:
-                    session.pop('output_calculated', None)
-                
-                message = "Correct flag! "
-                if stage_data['next_stage']:
-                    message += "Moving to the next stage..."
-                    return redirect(url_for('stage', stage_id=stage_data['next_stage']))
-                else:
-                    message += "Congratulations! You've completed all stages!"
-                    return redirect(url_for('completion'))
+                    session.modified = True
+                message = "Correct! You've successfully calculated the outputs. Moving to stage 3..."
+                return redirect(url_for('stage', stage_id=3))
             else:
-                message = "Incorrect flag. Try again!"
+                message = "Incorrect output calculation. Try again!"
+        elif form_type == 'script' and stage_id == 3:
+            # Handle script submission for stage 3
+            data = request.get_json()
+            code = data.get('code', '')
+            
+            # Create a temporary file for the script
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as temp_script:
+                temp_script.write(code)
+                temp_script_path = temp_script.name
+            
+            try:
+                # Run the script with the input file
+                result = subprocess.run(
+                    ['python', temp_script_path],
+                    capture_output=True,
+                    text=True,
+                    cwd=os.path.join(app.static_folder, 'files')
+                )
+                
+                # Clean up the temporary file
+                os.unlink(temp_script_path)
+                
+                if result.returncode == 0:
+                    # Get the expected output from the full dataset
+                    expected_output = process_sample_logic([
+                        [0, 1, 0, 0],
+                        [1, 0, 0, 1],
+                        [0, 0, 1, 1],
+                        [1, 1, 0, 0],
+                        [0, 1, 1, 1]
+                    ])
+                    
+                    if result.stdout.strip() == expected_output:
+                        if 'completed_stages' not in session:
+                            session['completed_stages'] = []
+                        if stage_id not in session['completed_stages']:
+                            session['completed_stages'].append(stage_id)
+                            session.modified = True
+                        return jsonify({
+                            'success': True,
+                            'message': "Correct! Your script produced the expected output. Congratulations! You've completed all stages!"
+                        })
+                    else:
+                        return jsonify({
+                            'success': False,
+                            'message': "Incorrect output. Try again!"
+                        })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'message': f"Error: {result.stderr}"
+                    })
+            except Exception as e:
+                # Clean up the temporary file in case of error
+                if os.path.exists(temp_script_path):
+                    os.unlink(temp_script_path)
+                return jsonify({
+                    'success': False,
+                    'message': f"Error: {str(e)}"
+                })
     
     context = {
         'stage': stage_data,
         'stage_id': stage_id,
-        'message': message,
-        'show_flag_input': show_flag_input
+        'message': message
     }
     
     if stage_id == 2:
@@ -158,8 +187,7 @@ def stage(stage_id):
 def completion():
     # Check if user has completed all stages
     if set(session.get('completed_stages', [])) == set([1, 2, 3]):
-        full_flag = STAGES[1]['flag'] + STAGES[2]['flag'] + STAGES[3]['flag']
-        return render_template('completion.html', full_flag=full_flag)
+        return render_template('completion.html')
     return redirect(url_for('index'))
 
 @app.route('/hint/<int:stage_id>')
@@ -212,63 +240,6 @@ def run_script():
         return jsonify({
             'success': False,
             'output': f"Error: {str(e)}"
-        })
-
-@app.route('/submit_script', methods=['POST'])
-def submit_script():
-    data = request.get_json()
-    code = data.get('code', '')
-    
-    # Create a temporary file for the script
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as temp_script:
-        temp_script.write(code)
-        temp_script_path = temp_script.name
-    
-    try:
-        # Run the script with the input file
-        result = subprocess.run(
-            ['python', temp_script_path],
-            capture_output=True,
-            text=True,
-            cwd=os.path.join(app.static_folder, 'files')
-        )
-        
-        # Clean up the temporary file
-        os.unlink(temp_script_path)
-        
-        if result.returncode == 0:
-            # Get the expected output from the full dataset
-            expected_output = process_sample_logic([
-                [0, 1, 0, 0],
-                [1, 0, 0, 1],
-                [0, 0, 1, 1],
-                [1, 1, 0, 0],
-                [0, 1, 1, 1]
-            ])
-            
-            if result.stdout.strip() == expected_output:
-                session['output_calculated'] = True
-                return jsonify({
-                    'success': True,
-                    'message': "Correct! Your script produced the expected output."
-                })
-            else:
-                return jsonify({
-                    'success': False,
-                    'message': "Incorrect output. Try again!"
-                })
-        else:
-            return jsonify({
-                'success': False,
-                'message': f"Error: {result.stderr}"
-            })
-    except Exception as e:
-        # Clean up the temporary file in case of error
-        if os.path.exists(temp_script_path):
-            os.unlink(temp_script_path)
-        return jsonify({
-            'success': False,
-            'message': f"Error: {str(e)}"
         })
 
 if __name__ == '__main__':
