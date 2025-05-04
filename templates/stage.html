@@ -128,6 +128,16 @@
                         <pre id="decoded-text"></pre>
                     </div>
                 </div>
+                <div class="flag-submission">
+                    <h3>Submit Flag</h3>
+                    <form id="flag-form" method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
+                        <input type="hidden" name="form_type" value="flag">
+                        <div class="flag-input">
+                            <input type="text" name="flag" placeholder="Enter the flag..." required>
+                            <button type="submit" class="btn submit-btn">Submit Flag</button>
+                        </div>
+                    </form>
+                </div>
             </div>
             {% endif %}
             

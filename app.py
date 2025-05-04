@@ -172,6 +172,20 @@ def stage(stage_id):
                     'success': False,
                     'message': f"Error: {str(e)}"
                 })
+        elif form_type == 'flag' and stage_id == 3:
+            # Handle flag submission for stage 3
+            submitted_flag = request.form.get('flag', '')
+            
+            if submitted_flag == stage_data['flag']:
+                if 'completed_stages' not in session:
+                    session['completed_stages'] = []
+                if stage_id not in session['completed_stages']:
+                    session['completed_stages'].append(stage_id)
+                    session.modified = True
+                message = f"Correct! Congratulations! You've completed all stages! Here's your flag: {stage_data['flag']}"
+                return redirect(url_for('completion'))
+            else:
+                message = "Incorrect flag. Try again!"
     
     context = {
         'stage': stage_data,
@@ -188,7 +202,7 @@ def stage(stage_id):
 def completion():
     # Check if user has completed all stages
     if set(session.get('completed_stages', [])) == set([1, 2, 3]):
-        return render_template('completion.html')
+        return render_template('completion.html', full_flag=STAGES[3]['flag'])
     return redirect(url_for('index'))
 
 @app.route('/hint/<int:stage_id>')
