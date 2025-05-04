@@ -89,8 +89,9 @@
             </div>
 
             <div id="stage1-flag-section" class="flag-reveal" style="display: none;">
-                <h2>Congratulations!</h2>
-                <p>You've correctly identified the logic gates! The flag for this stage is:</p>
+                <h2>Analysis Complete</h2>
+                <p>The circuit appears to be processing binary data in a specific pattern.</p>
+                <p>You've uncovered the first segment of the encoded message:</p>
                 <div class="revealed-flag">{{ stage.flag }}</div>
             </div>
             {% endif %}
@@ -109,8 +110,9 @@
             </div>
 
             <div id="stage2-flag-section" class="flag-reveal" style="display: none;">
-                <h2>Congratulations!</h2>
-                <p>You've correctly calculated the outputs! The flag for this stage is:</p>
+                <h2>Pattern Recognized</h2>
+                <p>The output pattern confirms our understanding of the circuit's behavior.</p>
+                <p>You've uncovered the second segment of the encoded message:</p>
                 <div class="revealed-flag">{{ stage.flag }}</div>
             </div>
             {% endif %}
@@ -143,8 +145,9 @@
             </div>
 
             <div id="stage3-flag-section" class="flag-reveal" style="display: none;">
-                <h2>Congratulations!</h2>
-                <p>You've successfully processed the full dataset! The flag for this stage is:</p>
+                <h2>Full Circuit Analysis Complete</h2>
+                <p>The complete dataset reveals the final piece of the circuit's function.</p>
+                <p>You've uncovered the final segment of the encoded message:</p>
                 <div class="revealed-flag">{{ stage.flag }}</div>
             </div>
             {% endif %}
@@ -202,55 +205,61 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+                return response.text();
+            })
             .then(html => {
+                if (!html) return;
+                
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const message = doc.querySelector('.message');
                 
-                if (message && message.textContent.includes('Correct!')) {
-                    document.getElementById(flagSectionId).style.display = 'block';
-                    
-                    // Create and show the flag submission form if it doesn't exist
-                    if (!document.querySelector('.flag-submission')) {
-                        const flagForm = document.createElement('div');
-                        flagForm.className = 'flag-submission';
-                        flagForm.innerHTML = `
-                            <h2>Submit Flag</h2>
-                            <form method="POST" action="${form.action}">
-                                <input type="hidden" name="form_type" value="flag">
-                                <input type="text" name="flag" placeholder="Enter flag...">
-                                <button type="submit" class="btn submit-btn">Submit</button>
-                            </form>
-                        `;
-                        document.querySelector('.challenge-content').appendChild(flagForm);
+                if (message) {
+                    // Update the message on the page
+                    const currentMessage = document.querySelector('.message');
+                    if (currentMessage) {
+                        currentMessage.textContent = message.textContent;
+                        currentMessage.className = message.className;
+                    } else {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = message.className;
+                        messageDiv.textContent = message.textContent;
+                        document.querySelector('.challenge-content').insertBefore(messageDiv, form.parentElement);
                     }
-                    
-                    message.scrollIntoView({ behavior: 'smooth' });
-                }
-                
-                // Update the message on the page
-                const currentMessage = document.querySelector('.message');
-                if (currentMessage) {
-                    currentMessage.textContent = message.textContent;
-                    currentMessage.className = message.className;
-                } else {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = message.className;
-                    messageDiv.textContent = message.textContent;
-                    document.querySelector('.challenge-content').insertBefore(messageDiv, form.parentElement);
-                }
 
-                // If it's a correct flag submission, show message and then redirect
-                if (message.textContent.includes('Correct flag!')) {
-                    setTimeout(() => {
-                        if (message.textContent.includes('Moving to the next stage')) {
-                            window.location.href = '/stage/' + (parseInt('{{ stage_id }}') + 1);
-                        } else if (message.textContent.includes('completed all stages')) {
-                            window.location.href = '/completion';
+                    if (message.textContent.includes('Correct!')) {
+                        document.getElementById(flagSectionId).style.display = 'block';
+                        
+                        // Create and show the flag submission form if it doesn't exist
+                        if (!document.querySelector('.flag-submission')) {
+                            const flagForm = document.createElement('div');
+                            flagForm.className = 'flag-submission';
+                            flagForm.innerHTML = `
+                                <h2>Submit Flag</h2>
+                                <form method="POST" action="${form.action}">
+                                    <input type="hidden" name="form_type" value="flag">
+                                    <input type="text" name="flag" placeholder="Enter flag...">
+                                    <button type="submit" class="btn submit-btn">Submit</button>
+                                </form>
+                            `;
+                            document.querySelector('.challenge-content').appendChild(flagForm);
                         }
-                    }, 2000); // Wait 2 seconds before redirecting
+                        
+                        message.scrollIntoView({ behavior: 'smooth' });
+                    }
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'An error occurred. Please try again.';
+                document.querySelector('.challenge-content').insertBefore(messageDiv, form.parentElement);
             });
         }
 

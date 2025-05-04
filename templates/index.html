@@ -4,38 +4,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hardware Logic Challenge - Low Logic</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <title>Hardware Reverse Engineering Challenge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Low Logic Has Been Pwned!</h1>
-            <p class="subtitle">A Multi-Stage Hardware Challenge</p>
+            <h1>Hardware Reverse Engineering Challenge</h1>
+            <p>Analyze and Decode an Unknown Integrated Circuit</p>
         </header>
-        
+
         <div class="challenge-intro">
-            <p>Welcome, hacker! Your mission is to reverse engineer a mysterious chip's logic and extract the hidden flag.</p>
-            <p>This challenge will test your understanding of digital logic, circuit analysis, and problem-solving skills.</p>
+            <h2>Mission Briefing</h2>
+            <p>Our team has recovered an unidentified integrated circuit from a recent operation. Initial analysis suggests it's a custom logic gate implementation, but its exact function remains unknown. We've managed to extract a dataset of its input/output behavior, but we need your expertise to understand its internal workings.</p>
+            
+            <div class="chip-diagram">
+                <img src="{{ url_for('static', filename='images/chip.jpg') }}" alt="Recovered IC Chip">
+                <p class="chip-caption">Recovered IC Chip - Markings suggest it's a custom implementation</p>
+            </div>
+            
+            <div class="challenge-resources">
+                <h3>Available Intelligence:</h3>
+                <ul>
+                    <li>Raw I/O behavior dataset (<a href="{{ url_for('static', filename='files/input.csv') }}" download>input.csv</a>) - Contains timestamped input/output pairs</li>
+                    <li>Logic gate simulation environment - For testing hypotheses</li>
+                    <li>Development environment - For processing and analyzing the full dataset</li>
+                </ul>
+            </div>
+
+            <h3>Analysis Phases:</h3>
+            <ol>
+                <li><strong>Pattern Recognition:</strong> Analyze the I/O patterns to identify the basic logic gate configuration. Look for telltale patterns in the truth table.</li>
+                <li><strong>Circuit Analysis:</strong> Determine how multiple gates are interconnected. This will help us understand the chip's overall function.</li>
+                <li><strong>Data Processing:</strong> Develop a processing script to handle the full dataset. The output may contain encoded information.</li>
+            </ol>
+
+            <div class="mission-note">
+                <p><strong>Note:</strong> The chip appears to be implementing a specific logic function. Your analysis will help us understand its purpose and potentially recover any encoded data.</p>
+            </div>
+
+            <p>Time is of the essence. Begin your analysis and report your findings.</p>
+            <a href="{{ url_for('stage', stage_id=1) }}" class="btn">Begin Analysis</a>
         </div>
-        
-        <div class="stages-overview">
-            <h2>Challenge Stages:</h2>
-            <ul>
-                {% for stage_id, stage in stages.items() %}
-                <li>
-                    <strong>Stage {{ stage_id }}:</strong> {{ stage.name }}
-                    {% if stage_id == 1 %}
-                        <a href="{{ url_for('stage', stage_id=stage_id) }}" class="btn">Start Challenge</a>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        
+
         <footer>
-            <p>Created for your CTF Website &copy; 2025</p>
-            <a href="{{ url_for('reset_progress') }}" class="reset-btn">Reset Progress</a>
+            <p>Secure Analysis Environment v1.0</p>
+            <a href="https://github.com/yourusername/logic-gate-challenge" target="_blank">Documentation</a>
         </footer>
     </div>
 </body>

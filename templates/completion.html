@@ -4,40 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Challenge Complete! - Low Logic Challenge</title>
+    <title>Challenge Complete - Low Logic</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container completion">
+    <div class="container">
         <header>
             <h1>Challenge Complete!</h1>
+            <p>Congratulations on completing the Low Logic Challenge</p>
         </header>
-        
-        <div class="congratulations">
-            <div class="fireworks"></div>
-            <h2>Congratulations, Hacker!</h2>
-            <p>You've successfully reversed engineered the Low Logic chip and extracted the flag.</p>
-            
-            <div class="final-flag">
-                <h3>The complete flag is:</h3>
-                <div class="flag-display">{{ full_flag }}</div>
-            </div>
-            
-            <div class="completion-message">
-                <p>You've demonstrated excellent skills in:</p>
-                <ul>
-                    <li>Circuit analysis</li>
-                    <li>Digital logic</li>
-                    <li>Problem-solving</li>
-                    <li>Programming automation</li>
-                </ul>
-            </div>
+
+        <div class="completion-message">
+            <h2>You've successfully completed all stages!</h2>
+            <p>Here's your complete flag:</p>
+            <div class="completion-flag">{{ full_flag }}</div>
+            <p>Great job on mastering the digital logic concepts!</p>
+            <a href="{{ url_for('index') }}" class="btn">Back to Challenge Overview</a>
         </div>
-        
+
         <footer>
             <p>Created for your CTF Website &copy; 2025</p>
-            <a href="{{ url_for('index') }}">Back to Challenge Overview</a>
-            <a href="{{ url_for('reset_progress') }}" class="reset-btn">Reset Progress</a>
         </footer>
     </div>
 </body>

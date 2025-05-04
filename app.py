@@ -8,6 +8,7 @@ import tempfile
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # For session management
+app.config["TEMPLATES_AUTO_RELOAD"] = True  # Enable template auto-reload
 
 # Challenge data
 STAGES = {
