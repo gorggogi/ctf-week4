@@ -1,0 +1,44 @@
+<!-- completion.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Complete! - Low Logic Challenge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container completion">
+        <header>
+            <h1>Challenge Complete!</h1>
+        </header>
+        
+        <div class="congratulations">
+            <div class="fireworks"></div>
+            <h2>Congratulations, Hacker!</h2>
+            <p>You've successfully reversed engineered the Low Logic chip and extracted the flag.</p>
+            
+            <div class="final-flag">
+                <h3>The complete flag is:</h3>
+                <div class="flag-display">{{ full_flag }}</div>
+            </div>
+            
+            <div class="completion-message">
+                <p>You've demonstrated excellent skills in:</p>
+                <ul>
+                    <li>Circuit analysis</li>
+                    <li>Digital logic</li>
+                    <li>Problem-solving</li>
+                    <li>Programming automation</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created for your CTF Website &copy; 2025</p>
+            <a href="{{ url_for('index') }}">Back to Challenge Overview</a>
+            <a href="{{ url_for('reset_progress') }}" class="reset-btn">Reset Progress</a>
+        </footer>
+    </div>
+</body>
+</html>

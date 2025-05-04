@@ -1,0 +1,42 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware Logic Challenge - Low Logic</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Low Logic Has Been Pwned!</h1>
+            <p class="subtitle">A Multi-Stage Hardware Challenge</p>
+        </header>
+        
+        <div class="challenge-intro">
+            <p>Welcome, hacker! Your mission is to reverse engineer a mysterious chip's logic and extract the hidden flag.</p>
+            <p>This challenge will test your understanding of digital logic, circuit analysis, and problem-solving skills.</p>
+        </div>
+        
+        <div class="stages-overview">
+            <h2>Challenge Stages:</h2>
+            <ul>
+                {% for stage_id, stage in stages.items() %}
+                <li>
+                    <strong>Stage {{ stage_id }}:</strong> {{ stage.name }}
+                    {% if stage_id == 1 %}
+                        <a href="{{ url_for('stage', stage_id=stage_id) }}" class="btn">Start Challenge</a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <footer>
+            <p>Created for your CTF Website &copy; 2025</p>
+            <a href="{{ url_for('reset_progress') }}" class="reset-btn">Reset Progress</a>
+        </footer>
+    </div>
+</body>
+</html>

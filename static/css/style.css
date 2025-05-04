@@ -1,0 +1,483 @@
+/* style.css */
+:root {
+    --primary-color: #00ff41; /* Matrix green */
+    --secondary-color: #072a07; /* Darker green */
+    --background-color: #0a0a0a; /* Almost black */
+    --text-color: #f0f0f0; /* Light gray */
+    --accent-color: #ff375f; /* Bright red for errors/highlights */
+    --success-color: #00ff41; /* Green for success */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: rgba(10, 10, 10, 0.8);
+    padding: 2rem;
+    border-radius: 5px;
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+h1, h2, h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    color: var(--text-color);
+    font-style: italic;
+}
+
+.challenge-intro {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.stages-overview ul {
+    list-style-type: none;
+}
+
+.stages-overview li {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--secondary-color);
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    text-decoration: none;
+    border: 1px solid var(--primary-color);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.download-btn {
+    margin-top: 10px;
+}
+
+.challenge-content {
+    margin-bottom: 2rem;
+}
+
+.challenge-description {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: rgba(7, 42, 7, 0.3);
+    border-radius: 5px;
+}
+
+.resources {
+    margin-top: 1.5rem;
+}
+
+.circuit-diagram {
+    max-width: 100%;
+    margin-top: 1rem;
+    border: 1px solid var(--primary-color);
+}
+
+.sample-data {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 8px 12px;
+    text-align: center;
+    border: 1px solid var(--secondary-color);
+}
+
+th {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.message {
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 3px;
+}
+
+.success {
+    background-color: rgba(0, 255, 65, 0.1);
+    border: 1px solid var(--success-color);
+}
+
+.error {
+    background-color: rgba(255, 55, 95, 0.1);
+    border: 1px solid var(--accent-color);
+}
+
+.flag-submission {
+    margin-bottom: 2rem;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.submit-btn {
+    background-color: var(--secondary-color);
+}
+
+.hint-section {
+    margin-bottom: 1rem;
+}
+
+details {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px dashed var(--secondary-color);
+    border-radius: 3px;
+}
+
+summary {
+    cursor: pointer;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.hint-content {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgba(7, 42, 7, 0.3);
+    border-radius: 3px;
+}
+
+footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+.reset-btn {
+    color: var(--accent-color);
+}
+
+/* Completion page styles */
+.completion {
+    text-align: center;
+}
+
+.congratulations {
+    padding: 2rem;
+}
+
+.final-flag {
+    margin: 2rem 0;
+}
+
+.flag-display {
+    font-size: 1.5rem;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+    display: inline-block;
+    margin: 1rem 0;
+    font-weight: bold;
+    color: var(--primary-color);
+    letter-spacing: 1px;
+}
+
+.completion-message ul {
+    display: inline-block;
+    text-align: left;
+    margin: 0 auto;
+}
+
+.fireworks {
+    height: 100px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 10 L52 40 L50 45 L48 40 Z" fill="%2300ff41"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(45 50 50)"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(90 50 50)"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(135 50 50)"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(180 50 50)"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(225 50 50)"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(270 50 50)"/><path d="M50 10 L55 35 L50 40 L45 35 Z" fill="%2300ff41" transform="rotate(315 50 50)"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.7;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    form {
+        flex-direction: column;
+    }
+    
+    .stages-overview li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.gate-identification {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gate-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.gate-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.gate-input label {
+    font-weight: 600;
+    color: #333;
+}
+
+.gate-input input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.gate-input input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.flag-reveal {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: rgba(0, 255, 65, 0.1);
+    border: 1px solid var(--success-color);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.revealed-flag {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: var(--secondary-color);
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.output-calculation {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: rgba(7, 42, 7, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.output-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.output-input label {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.output-input input {
+    padding: 0.75rem;
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+}
+
+.output-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.25);
+}
+
+.output-input input:invalid {
+    border-color: var(--accent-color);
+}
+
+.code-editor-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: rgba(7, 42, 7, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.editor-container {
+    height: 400px;
+    margin: 1rem 0;
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.monaco-editor {
+    height: 100%;
+}
+
+.editor-controls {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.run-btn {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.run-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.output-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+}
+
+.output-container pre {
+    margin: 0;
+    padding: 0.5rem;
+    font-family: 'Courier New', monospace;
+    color: var(--primary-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.binary-decoder {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: rgba(7, 42, 7, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.decoder-input {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.decoder-input input {
+    flex: 1;
+    padding: 0.75rem;
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+}
+
+.decoder-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.25);
+}
+
+.decoder-input input:invalid {
+    border-color: var(--accent-color);
+}
+
+.decoded-output {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+}
+
+.decoded-output pre {
+    margin: 0;
+    padding: 0.5rem;
+    font-family: 'Courier New', monospace;
+    color: var(--primary-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

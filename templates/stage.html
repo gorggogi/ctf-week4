@@ -1,0 +1,399 @@
+<!-- stage.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage {{ stage_id }} - Low Logic Challenge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stage {{ stage_id }}: {{ stage.name }}</h1>
+        </header>
+        
+        <div class="challenge-content">
+            <div class="challenge-description">
+                <h2>Description</h2>
+                <p>{{ stage.description }}</p>
+                
+                {% if stage_id == 1 %}
+                <div class="resources">
+                    <h3>Resources:</h3>
+                    <img src="{{ url_for('static', filename='images/chip.jpg') }}" alt="Circuit Diagram" class="circuit-diagram">
+                </div>
+                {% endif %}
+                
+                {% if stage_id == 2 %}
+                <div class="sample-data">
+                    <h3>Sample Input Data:</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>IN0</th>
+                                <th>IN1</th>
+                                <th>IN2</th>
+                                <th>IN3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in sample_data %}
+                            <tr>
+                                {% for val in row %}
+                                <td>{{ val }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                
+                {% if stage_id == 3 %}
+                <div class="resources">
+                    <h3>Resources:</h3>
+                    <p>Download the full input dataset:</p>
+                    <a href="{{ url_for('static', filename='files/input.csv') }}" class="btn download-btn">Download input.csv</a>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if message %}
+            <div class="message {{ 'success' if 'Correct' in message else 'error' }}">
+                {{ message }}
+            </div>
+            {% endif %}
+            
+            {% if stage_id == 1 %}
+            <div class="gate-identification">
+                <h2>Identify the Logic Gates</h2>
+                <form id="gate-form" method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
+                    <input type="hidden" name="form_type" value="gates">
+                    <div class="gate-inputs">
+                        <div class="gate-input">
+                            <label for="gate1">First Gate:</label>
+                            <input type="text" name="gate1" placeholder="Enter gate type..." required>
+                        </div>
+                        <div class="gate-input">
+                            <label for="gate2">Second Gate:</label>
+                            <input type="text" name="gate2" placeholder="Enter gate type..." required>
+                        </div>
+                        <div class="gate-input">
+                            <label for="gate3">Third Gate:</label>
+                            <input type="text" name="gate3" placeholder="Enter gate type..." required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn submit-btn">Submit Gates</button>
+                </form>
+            </div>
+
+            <div id="stage1-flag-section" class="flag-reveal" style="display: none;">
+                <h2>Congratulations!</h2>
+                <p>You've correctly identified the logic gates! The flag for this stage is:</p>
+                <div class="revealed-flag">{{ stage.flag }}</div>
+            </div>
+            {% endif %}
+
+            {% if stage_id == 2 %}
+            <div class="output-calculation">
+                <h2>Calculate Outputs</h2>
+                <form id="output-form" method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
+                    <input type="hidden" name="form_type" value="output">
+                    <div class="output-input">
+                        <label for="output">Enter the binary output sequence (e.g., 01001):</label>
+                        <input type="text" name="output" placeholder="Enter output sequence..." required pattern="[01]+">
+                    </div>
+                    <button type="submit" class="btn submit-btn">Submit Output</button>
+                </form>
+            </div>
+
+            <div id="stage2-flag-section" class="flag-reveal" style="display: none;">
+                <h2>Congratulations!</h2>
+                <p>You've correctly calculated the outputs! The flag for this stage is:</p>
+                <div class="revealed-flag">{{ stage.flag }}</div>
+            </div>
+            {% endif %}
+            
+            {% if stage_id == 3 %}
+            <div class="code-editor-section">
+                <h2>Write Your Script</h2>
+                <div class="editor-container">
+                    <div id="editor" class="monaco-editor"></div>
+                </div>
+                <div class="editor-controls">
+                    <button id="run-script" class="btn run-btn">Run Script</button>
+                    <button id="submit-script" class="btn submit-btn">Submit Output</button>
+                </div>
+                <div id="output-container" class="output-container" style="display: none;">
+                    <h3>Script Output:</h3>
+                    <pre id="script-output"></pre>
+                </div>
+                <div class="binary-decoder">
+                    <h3>Decode Binary Output</h3>
+                    <div class="decoder-input">
+                        <input type="text" id="binary-input" placeholder="Paste binary output here..." pattern="[01]+">
+                        <button id="decode-btn" class="btn">Decode</button>
+                    </div>
+                    <div id="decoded-output" class="decoded-output" style="display: none;">
+                        <h4>Decoded Text:</h4>
+                        <pre id="decoded-text"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stage3-flag-section" class="flag-reveal" style="display: none;">
+                <h2>Congratulations!</h2>
+                <p>You've successfully processed the full dataset! The flag for this stage is:</p>
+                <div class="revealed-flag">{{ stage.flag }}</div>
+            </div>
+            {% endif %}
+            
+            {% if (stage_id == 1 and show_flag_input) or (stage_id == 2 and show_flag_input) or stage_id > 2 %}
+            <div class="flag-submission">
+                <h2>Submit Flag</h2>
+                <form method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
+                    <input type="hidden" name="form_type" value="flag">
+                    <input type="text" name="flag" placeholder="Enter flag...">
+                    <button type="submit" class="btn submit-btn">Submit</button>
+                </form>
+            </div>
+            {% endif %}
+            
+            <div class="hint-section">
+                <details>
+                    <summary>Need a hint?</summary>
+                    <div class="hint-content">
+                        {{ stage.hint }}
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created for your CTF Website &copy; 2025</p>
+            <a href="{{ url_for('index') }}">Back to Challenge Overview</a>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+    <script>
+        // Handle gate form submission
+        const gateForm = document.getElementById('gate-form');
+        if (gateForm) {
+            gateForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleFormSubmission(this, 'stage1-flag-section');
+            });
+        }
+
+        // Handle output form submission
+        const outputForm = document.getElementById('output-form');
+        if (outputForm) {
+            outputForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleFormSubmission(this, 'stage2-flag-section');
+            });
+        }
+
+        function handleFormSubmission(form, flagSectionId) {
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const message = doc.querySelector('.message');
+                
+                if (message && message.textContent.includes('Correct!')) {
+                    document.getElementById(flagSectionId).style.display = 'block';
+                    
+                    // Create and show the flag submission form if it doesn't exist
+                    if (!document.querySelector('.flag-submission')) {
+                        const flagForm = document.createElement('div');
+                        flagForm.className = 'flag-submission';
+                        flagForm.innerHTML = `
+                            <h2>Submit Flag</h2>
+                            <form method="POST" action="${form.action}">
+                                <input type="hidden" name="form_type" value="flag">
+                                <input type="text" name="flag" placeholder="Enter flag...">
+                                <button type="submit" class="btn submit-btn">Submit</button>
+                            </form>
+                        `;
+                        document.querySelector('.challenge-content').appendChild(flagForm);
+                    }
+                    
+                    message.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                // Update the message on the page
+                const currentMessage = document.querySelector('.message');
+                if (currentMessage) {
+                    currentMessage.textContent = message.textContent;
+                    currentMessage.className = message.className;
+                } else {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = message.className;
+                    messageDiv.textContent = message.textContent;
+                    document.querySelector('.challenge-content').insertBefore(messageDiv, form.parentElement);
+                }
+
+                // If it's a correct flag submission, show message and then redirect
+                if (message.textContent.includes('Correct flag!')) {
+                    setTimeout(() => {
+                        if (message.textContent.includes('Moving to the next stage')) {
+                            window.location.href = '/stage/' + (parseInt('{{ stage_id }}') + 1);
+                        } else if (message.textContent.includes('completed all stages')) {
+                            window.location.href = '/completion';
+                        }
+                    }, 2000); // Wait 2 seconds before redirecting
+                }
+            });
+        }
+
+        // Initialize Monaco Editor for stage 3
+        if (document.getElementById('editor')) {
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' }});
+            require(['vs/editor/editor.main'], function() {
+                const editor = monaco.editor.create(document.getElementById('editor'), {
+                    value: `# Welcome to Stage 3! Let's process the input data.
+# The input.csv file contains 4 columns: in0, in1, in2, in3
+# Each row represents inputs to our logic circuit.
+
+
+import csv
+
+with open('input.csv', 'r') as f:
+    reader = csv.reader(f)
+    next(reader)  
+    
+
+    for row in reader:
+
+        in0, in1, in2, in3 = map(int, row)
+        
+        # TODO: Implement the logic circuit here
+       
+        
+ 
+        print(result, end='')`,
+                    language: 'python',
+                    theme: 'vs-dark',
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    lineNumbers: 'on',
+                    scrollBeyondLastLine: false,
+                    renderWhitespace: 'selection',
+                    tabSize: 4
+                });
+
+                // Handle run button click
+                document.getElementById('run-script').addEventListener('click', function() {
+                    const code = editor.getValue();
+                    fetch('/run_script', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ code: code })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const outputContainer = document.getElementById('output-container');
+                        const outputElement = document.getElementById('script-output');
+                        outputElement.textContent = data.output;
+                        outputContainer.style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+
+                // Handle submit button click
+                document.getElementById('submit-script').addEventListener('click', function() {
+                    const code = editor.getValue();
+                    fetch('/submit_script', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ code: code })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('stage3-flag-section').style.display = 'block';
+                            if (!document.querySelector('.flag-submission')) {
+                                const flagForm = document.createElement('div');
+                                flagForm.className = 'flag-submission';
+                                flagForm.innerHTML = `
+                                    <h2>Submit Flag</h2>
+                                    <form method="POST" action="{{ url_for('stage', stage_id=stage_id) }}">
+                                        <input type="hidden" name="form_type" value="flag">
+                                        <input type="text" name="flag" placeholder="Enter flag...">
+                                        <button type="submit" class="btn submit-btn">Submit</button>
+                                    </form>
+                                `;
+                                document.querySelector('.challenge-content').appendChild(flagForm);
+                            }
+                        }
+                        // Show message
+                        const currentMessage = document.querySelector('.message');
+                        if (currentMessage) {
+                            currentMessage.textContent = data.message;
+                            currentMessage.className = `message ${data.success ? 'success' : 'error'}`;
+                        } else {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `message ${data.success ? 'success' : 'error'}`;
+                            messageDiv.textContent = data.message;
+                            document.querySelector('.challenge-content').insertBefore(messageDiv, document.querySelector('.code-editor-section'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        }
+
+        // Add binary decoder functionality
+        document.getElementById('decode-btn').addEventListener('click', function() {
+            const binaryInput = document.getElementById('binary-input').value;
+            if (!/^[01]+$/.test(binaryInput)) {
+                alert('Please enter a valid binary string (only 0s and 1s)');
+                return;
+            }
+            
+            // Convert binary to text
+            let text = '';
+            for (let i = 0; i < binaryInput.length; i += 8) {
+                const byte = binaryInput.substr(i, 8);
+                text += String.fromCharCode(parseInt(byte, 2));
+            }
+            
+            // Display decoded text
+            const decodedOutput = document.getElementById('decoded-output');
+            const decodedText = document.getElementById('decoded-text');
+            decodedText.textContent = text;
+            decodedOutput.style.display = 'block';
+        });
+        
+        // Auto-fill binary input when script output is shown
+        document.getElementById('run-script').addEventListener('click', function() {
+            const outputContainer = document.getElementById('output-container');
+            const binaryInput = document.getElementById('binary-input');
+            
+            outputContainer.addEventListener('DOMSubtreeModified', function() {
+                const scriptOutput = document.getElementById('script-output').textContent;
+                if (scriptOutput && /^[01]+$/.test(scriptOutput)) {
+                    binaryInput.value = scriptOutput;
+                }
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
